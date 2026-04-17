@@ -9,9 +9,10 @@ A full-stack lost-item reporting portal with:
 ## Features
 
 - View all lost item reports
-- Create a new report
-- Edit an existing report
-- Delete a report
+- Register and login users
+- Create a new report (authenticated)
+- Edit an existing report (owner-only)
+- Delete a report (owner-only)
 
 ## Project structure
 
@@ -35,6 +36,11 @@ DB_NAME=lost_items
 DB_PORT=5432
 VITE_API_URL=http://localhost:8080/api
 APP_CORS_ALLOWED_ORIGINS=http://localhost:3000,http://127.0.0.1:3000
+AUTH_JWT_SECRET=replace-this-with-a-very-long-secret-key-for-jwt-signing-please-change
+AUTH_JWT_ACCESS_TOKEN_EXPIRATION_SECONDS=900
+AUTH_REFRESH_TOKEN_EXPIRATION_SECONDS=1209600
+AUTH_REFRESH_COOKIE_SECURE=false
+AUTH_REFRESH_COOKIE_SAME_SITE=Lax
 ```
 
 > If port `5432` is already used on your machine, set `DB_PORT` to another port (for example `5433`).
@@ -47,7 +53,7 @@ docker compose up --build -d
 
 Access:
 - Frontend: `http://localhost:3000`
-- Backend API: `http://localhost:8080/api/lost-items`
+- Backend API: `http://localhost:8080/api`
 - PostgreSQL: `localhost:${DB_PORT}`
 
 Stop:
@@ -89,3 +95,25 @@ npm run build
 cd backend
 sh ./mvnw test
 ```
+
+## Authentication flow
+
+1. Register: `POST /api/auth/register` with `email` and `password` (min 8 chars).
+2. Login: `POST /api/auth/login` with credentials.
+3. Backend returns:
+   - short-lived JWT access token in response body
+   - refresh token in `HttpOnly` cookie (`refreshToken`)
+4. Frontend stores access token in memory and sends it as `Authorization: Bearer <token>` for protected calls.
+5. On reload/session restore, frontend calls `POST /api/auth/refresh` (cookie-based) to get a new access token.
+6. Logout: `POST /api/auth/logout` revokes refresh token and clears cookie.
+
+## API authorization rules
+
+| Endpoint | Access |
+| --- | --- |
+| `GET /api/lost-items` | Public |
+| `GET /api/lost-items/{id}` | Public |
+| `POST /api/lost-items` | Authenticated |
+| `PUT /api/lost-items/{id}` | Authenticated + owner only |
+| `DELETE /api/lost-items/{id}` | Authenticated + owner only |
+| `/api/auth/*` | Public (except `/api/auth/me` requires auth) |

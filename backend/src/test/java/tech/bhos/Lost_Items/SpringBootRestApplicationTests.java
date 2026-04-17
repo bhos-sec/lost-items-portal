@@ -39,17 +39,18 @@ class SpringBootRestApplicationTests {
     @DisplayName("Service create persists a lost item")
     void createLostItem() throws Exception {
         LostItemRequest payload = validPayload();
-        LostItem created = lostItemService.addLostItem(payload);
+        LostItem created = lostItemService.addLostItem(payload, 1L);
 
         assertThat(created.getItemId()).isNotNull();
         assertThat(created.getItemName()).isEqualTo(payload.itemName());
+        assertThat(created.getCreatedByUserId()).isEqualTo(1L);
         assertThat(lostItemRepo.findAll()).hasSize(1);
     }
 
     @Test
     @DisplayName("Service update throws when item is missing")
     void updateMissingItemReturnsNotFound() throws Exception {
-        assertThatThrownBy(() -> lostItemService.updateLostItem(99999, validPayload()))
+        assertThatThrownBy(() -> lostItemService.updateLostItem(99999, validPayload(), 1L))
                 .isInstanceOf(LostItemNotFoundException.class)
                 .hasMessageContaining("99999");
     }
@@ -73,9 +74,9 @@ class SpringBootRestApplicationTests {
     @Test
     @DisplayName("Service delete removes an existing item")
     void deleteLostItem() throws Exception {
-        LostItem created = lostItemService.addLostItem(validPayload());
+        LostItem created = lostItemService.addLostItem(validPayload(), 1L);
 
-        lostItemService.deleteLostItem(created.getItemId());
+        lostItemService.deleteLostItem(created.getItemId(), 1L);
         assertThat(lostItemRepo.findById(created.getItemId())).isEmpty();
     }
 

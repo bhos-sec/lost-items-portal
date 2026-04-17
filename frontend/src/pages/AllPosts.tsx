@@ -12,6 +12,7 @@ import { Edit, AlertTriangle, MapPin } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { lostItemsApi } from "../api/lostItemsApi";
+import { useAuth } from "../hooks/useAuth";
 import type { LostItem } from "../types/lostItem";
 
 const AllPosts = () => {
@@ -19,6 +20,7 @@ const AllPosts = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const navigate = useNavigate();
+  const { user } = useAuth();
 
   useEffect(() => {
     fetchLostItems();
@@ -129,6 +131,7 @@ const AllPosts = () => {
                     size="small"
                     startIcon={<Edit size={16} />}
                     onClick={() => handleEdit(item.itemId)}
+                    disabled={user?.userId !== item.createdByUserId}
                   >
                     Edit
                   </Button>

@@ -24,4 +24,5 @@ public class LostItem {
     private String itemDesc;
     private String itemLocation;
     private String founderNumber;
+    private Long createdByUserId;
 }

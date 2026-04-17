@@ -14,6 +14,7 @@ import { Save, Trash2 } from "lucide-react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import { motion } from "framer-motion";
 import { lostItemsApi } from "../api/lostItemsApi";
+import { useAuth } from "../hooks/useAuth";
 import type { LostItemForm } from "../types/lostItem";
 import { isValidPhoneNumber } from "../utils/phoneValidation";
 
@@ -21,6 +22,7 @@ const Edit = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const itemId = searchParams.get("id");
+  const { user } = useAuth();
 
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
@@ -53,6 +55,10 @@ const Edit = () => {
       setLoading(true);
       setError(null);
       const item = await lostItemsApi.getById(itemId);
+      if (user && item.createdByUserId !== user.userId) {
+        setError("You do not have permission to edit this item.");
+        return;
+      }
 
       setFormData({
         itemName: item.itemName,
@@ -68,7 +74,7 @@ const Edit = () => {
     } finally {
       setLoading(false);
     }
-  }, [itemId]);
+  }, [itemId, user]);
 
   useEffect(() => {
     fetchLostItem();

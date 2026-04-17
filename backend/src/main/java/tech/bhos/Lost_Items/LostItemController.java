@@ -3,9 +3,11 @@ package tech.bhos.Lost_Items;
 import jakarta.validation.Valid;
 import tech.bhos.Lost_Items.dto.LostItemRequest;
 import tech.bhos.Lost_Items.model.LostItem;
+import tech.bhos.Lost_Items.security.AppUserPrincipal;
 import tech.bhos.Lost_Items.service.LostItemService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
 import java.util.List;
 
@@ -29,17 +31,27 @@ public class LostItemController {
     }
 
     @PostMapping
-    public LostItem create(@Valid @RequestBody LostItemRequest item) {
-        return service.addLostItem(item);
+    public LostItem create(
+            @Valid @RequestBody LostItemRequest item,
+            @AuthenticationPrincipal AppUserPrincipal principal
+    ) {
+        return service.addLostItem(item, principal.userId());
     }
 
     @PutMapping("/{id}")
-    public LostItem update(@PathVariable Integer id, @Valid @RequestBody LostItemRequest item) {
-        return service.updateLostItem(id, item);
+    public LostItem update(
+            @PathVariable Integer id,
+            @Valid @RequestBody LostItemRequest item,
+            @AuthenticationPrincipal AppUserPrincipal principal
+    ) {
+        return service.updateLostItem(id, item, principal.userId());
     }
 
     @DeleteMapping("/{id}")
-    public void delete(@PathVariable Integer id) {
-        service.deleteLostItem(id);
+    public void delete(
+            @PathVariable Integer id,
+            @AuthenticationPrincipal AppUserPrincipal principal
+    ) {
+        service.deleteLostItem(id, principal.userId());
     }
 }

@@ -4,6 +4,7 @@ export interface LostItem {
   itemDesc: string;
   itemLocation: string;
   founderNumber: string;
+  createdByUserId: number;
 }
 
 export interface LostItemForm {

@@ -1,12 +1,5 @@
-import axios from "axios";
 import type { LostItem, LostItemForm } from "../types/lostItem";
-
-const baseApiUrl = (import.meta.env.VITE_API_URL ?? "http://localhost:8080/api")
-  .replace(/\/+$/, "");
-
-const apiClient = axios.create({
-  baseURL: baseApiUrl,
-});
+import { apiClient } from "./client";
 
 export const lostItemsApi = {
   async getAll() {
