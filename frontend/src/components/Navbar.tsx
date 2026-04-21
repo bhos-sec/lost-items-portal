@@ -1,8 +1,15 @@
 import { AppBar, Toolbar, Typography, Button, Box } from "@mui/material";
 import { Package, Plus, List } from "lucide-react";
 import { Link } from "react-router-dom";
+import { useAuth } from "../hooks/useAuth";
 
 const Navbar = () => {
+  const { isAuthenticated, user, logout } = useAuth();
+
+  const handleLogout = async () => {
+    await logout();
+  };
+
   return (
     <AppBar position="sticky" sx={{ top: 0, zIndex: 1100 }}>
       <Toolbar>
@@ -27,6 +34,25 @@ const Navbar = () => {
           >
             Report Lost Item
           </Button>
+          {!isAuthenticated ? (
+            <>
+              <Button color="inherit" component={Link} to="/login">
+                Login
+              </Button>
+              <Button color="inherit" component={Link} to="/register">
+                Register
+              </Button>
+            </>
+          ) : (
+            <>
+              <Typography variant="body2" sx={{ alignSelf: "center", px: 1 }}>
+                {user?.email}
+              </Typography>
+              <Button color="inherit" onClick={handleLogout}>
+                Logout
+              </Button>
+            </>
+          )}
         </Box>
       </Toolbar>
     </AppBar>

@@ -10,6 +10,7 @@ import org.springframework.boot.test.context.SpringBootTest;
 import tech.bhos.Lost_Items.dto.LostItemRequest;
 import tech.bhos.Lost_Items.exception.LostItemNotFoundException;
 import tech.bhos.Lost_Items.model.LostItem;
+import tech.bhos.Lost_Items.model.LostItemStatus;
 import tech.bhos.Lost_Items.repository.LostItemRepo;
 import tech.bhos.Lost_Items.service.LostItemService;
 
@@ -39,17 +40,18 @@ class SpringBootRestApplicationTests {
     @DisplayName("Service create persists a lost item")
     void createLostItem() throws Exception {
         LostItemRequest payload = validPayload();
-        LostItem created = lostItemService.addLostItem(payload);
+        LostItem created = lostItemService.addLostItem(payload, 1L);
 
         assertThat(created.getItemId()).isNotNull();
         assertThat(created.getItemName()).isEqualTo(payload.itemName());
+        assertThat(created.getCreatedByUserId()).isEqualTo(1L);
         assertThat(lostItemRepo.findAll()).hasSize(1);
     }
 
     @Test
     @DisplayName("Service update throws when item is missing")
     void updateMissingItemReturnsNotFound() throws Exception {
-        assertThatThrownBy(() -> lostItemService.updateLostItem(99999, validPayload()))
+        assertThatThrownBy(() -> lostItemService.updateLostItem(99999, validPayload(), 1L))
                 .isInstanceOf(LostItemNotFoundException.class)
                 .hasMessageContaining("99999");
     }
@@ -61,7 +63,8 @@ class SpringBootRestApplicationTests {
                 "Laptop",
                 "Silver 13-inch laptop",
                 "Engineering building",
-                "bad-phone"
+                "bad-phone",
+                LostItemStatus.STILL_LOOKING
         );
         Set<ConstraintViolation<LostItemRequest>> violations = validator.validate(payload);
 
@@ -73,9 +76,9 @@ class SpringBootRestApplicationTests {
     @Test
     @DisplayName("Service delete removes an existing item")
     void deleteLostItem() throws Exception {
-        LostItem created = lostItemService.addLostItem(validPayload());
+        LostItem created = lostItemService.addLostItem(validPayload(), 1L);
 
-        lostItemService.deleteLostItem(created.getItemId());
+        lostItemService.deleteLostItem(created.getItemId(), 1L);
         assertThat(lostItemRepo.findById(created.getItemId())).isEmpty();
     }
 
@@ -84,7 +87,8 @@ class SpringBootRestApplicationTests {
                 "Laptop",
                 "Silver 13-inch laptop",
                 "Engineering building",
-                "+12025550123"
+                "+12025550123",
+                LostItemStatus.STILL_LOOKING
         );
     }
 

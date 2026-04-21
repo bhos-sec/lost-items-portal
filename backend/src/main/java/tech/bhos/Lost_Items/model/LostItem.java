@@ -1,9 +1,12 @@
 package tech.bhos.Lost_Items.model;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.PrePersist;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
@@ -24,4 +27,14 @@ public class LostItem {
     private String itemDesc;
     private String itemLocation;
     private String founderNumber;
+    @Enumerated(EnumType.STRING)
+    private LostItemStatus status;
+    private Long createdByUserId;
+
+    @PrePersist
+    public void ensureDefaults() {
+        if (status == null) {
+            status = LostItemStatus.STILL_LOOKING;
+        }
+    }
 }

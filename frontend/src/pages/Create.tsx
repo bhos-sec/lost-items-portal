@@ -8,12 +8,17 @@ import {
   Button,
   Alert,
   Stack,
+  MenuItem,
 } from "@mui/material";
 import { Save, Package } from "lucide-react";
 import { useNavigate } from "react-router-dom";
 import { motion } from "framer-motion";
 import { lostItemsApi } from "../api/lostItemsApi";
 import type { LostItemForm } from "../types/lostItem";
+import {
+  LOST_ITEM_STATUS_LABELS,
+  LOST_ITEM_STATUS_OPTIONS,
+} from "../types/lostItemStatus";
 import { isValidPhoneNumber } from "../utils/phoneValidation";
 
 const Create = () => {
@@ -27,6 +32,7 @@ const Create = () => {
     itemDesc: "",
     itemLocation: "",
     founderNumber: "",
+    status: "STILL_LOOKING",
   });
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -176,6 +182,22 @@ const Create = () => {
                   helperText="Enter a valid phone number"
                 />
               </Box>
+              <TextField
+                select
+                fullWidth
+                label="Status"
+                name="status"
+                value={formData.status}
+                onChange={handleChange}
+                required
+                disabled={loading}
+              >
+                {LOST_ITEM_STATUS_OPTIONS.map((status) => (
+                  <MenuItem key={status} value={status}>
+                    {LOST_ITEM_STATUS_LABELS[status]}
+                  </MenuItem>
+                ))}
+              </TextField>
 
               <Box sx={{ display: "flex", gap: 2, justifyContent: "flex-end" }}>
                 <Button
